@@ -1,0 +1,5 @@
+{
+    "BACKEND_APP_HOST": "localhost",
+    "BACKEND_PORT": 5000
+
+}

@@ -1,0 +1,8 @@
+{
+    "url": "mongodb+srv://riadatabase:DisE1GZODgyflgWm@cluster0.zjblwai.mongodb.net/",
+    "database_name" : "expensemanager",
+    "users_collection": "users",
+    "category_collection": "category",
+    "expense_collection": "expense"
+
+}
