@@ -27,3 +27,7 @@ async function addNewExpense(request) {
       })
   })
 }
+
+module.exports = {
+  addNewExpense: addNewExpense,
+}
