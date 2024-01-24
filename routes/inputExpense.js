@@ -1,6 +1,7 @@
 const express = require('express')
 const authJWT = require('../middlewares/authJwt')
-const handleInputExpense = require('../services/handleInputExpense')
+const handleInputExpense = require('../services/database/handleInputExpense')
+const router = express.Router()
 
 router.post('/', authJWT.verifyToken, (req, res) => {
   const request = {
@@ -26,6 +27,15 @@ router.post('/', authJWT.verifyToken, (req, res) => {
       }
     })
     .catch((error) => {
+      res.json('error saving input')
       console.log(error)
     })
 })
+
+function getRandomInt() {
+  max = Number.MAX_SAFE_INTEGER
+  min = 0
+  return Math.floor(Math.random() * (max - min) + min)
+}
+
+module.exports = router

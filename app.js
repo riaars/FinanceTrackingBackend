@@ -1,11 +1,38 @@
 const express = require('express')
-const app = express()
+const cors = require('cors')
+const database = require('./config/database.json')
+const db = require('./models')
+const config = require('./config/configuration.json')
 const port = 5000
+
+const BACKEND_APP_HOST = config.BACKEND_APP_HOST
+const BACKEND_APP_PORT = config.BACKEND_APP_PORT
+
+const inputExpense = require('./routes/inputExpense')
+
+const app = express()
 
 app.get('/', (req, res) => {
   res.send('Expense budget endpoint')
 })
+app.use([express.json(), cors()])
+app.use('/inputExpense', inputExpense)
+
+const expense_db = database.url + '/' + database.database_name
+db.mongoose
+  .connect(expense_db, {
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Successfully connect to MongoDB')
+  })
+  .catch((error) => {
+    console.error(('Connection error', error))
+    process.exit()
+  })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(
+    `Server running at: http://${BACKEND_APP_HOST}:${BACKEND_APP_PORT}`,
+  )
 })
