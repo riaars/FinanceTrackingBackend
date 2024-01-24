@@ -20,9 +20,7 @@ app.use('/inputExpense', inputExpense)
 
 const expense_db = database.url + '/' + database.database_name
 db.mongoose
-  .connect(expense_db, {
-    useUnifiedTopology: true,
-  })
+  .connect(expense_db, {})
   .then(() => {
     console.log('Successfully connect to MongoDB')
   })
