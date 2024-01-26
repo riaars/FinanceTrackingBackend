@@ -8,6 +8,8 @@ const port = 5000
 const BACKEND_APP_HOST = config.BACKEND_APP_HOST
 const BACKEND_APP_PORT = config.BACKEND_APP_PORT
 
+const signIn = require('./routes/signIn')
+const signUp = require('./routes/signUp')
 const inputExpense = require('./routes/inputExpense')
 
 const app = express()
@@ -16,6 +18,8 @@ app.get('/', (req, res) => {
   res.send('Expense budget endpoint')
 })
 app.use([express.json(), cors()])
+app.use('/signIn', signIn)
+app.use('/signUp', signUp)
 app.use('/inputExpense', inputExpense)
 
 const expense_db = database.url + '/' + database.database_name
