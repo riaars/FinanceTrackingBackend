@@ -7,6 +7,7 @@ var jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
 exports.signup = (req, res) => {
+  console.log(req)
   const user = new User({
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
@@ -54,8 +55,8 @@ exports.signin = (req, res) => {
   User.findOne({
     email: req.body.email,
   })
-    .poplate('roles', '-___v')
-    .exec((err, user) => {
+    .populate('roles', '-___v')
+    .then((user) => {
       if (err) {
         res.status(500).send({ message: err })
         return
@@ -94,5 +95,10 @@ exports.signin = (req, res) => {
         roles: authorities,
         accessToken: token,
       })
+    })
+    .catch((err) => {
+      if (err) {
+        res.status(500).send({ message: err })
+      }
     })
 }
