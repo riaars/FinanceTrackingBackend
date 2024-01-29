@@ -20,6 +20,7 @@ async function addNewExpense(request) {
       email: request.email,
       data: data,
     })
+
       .then((result) => {
         if (result) {
           console.log(result)

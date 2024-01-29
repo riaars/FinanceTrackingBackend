@@ -14,6 +14,7 @@ router.post('/', (req, res) => {
   handleInputExpense
     .addNewExpense(request)
     .then((result) => {
+      console.log(result)
       if (result) {
         res.json({
           status: 'success',
