@@ -69,12 +69,15 @@ async function addNewEntry(collectionName, query) {
       database.url,
       { useNewUrlParser: true, useUnifiedTopology: true },
       function (err, client) {
+        console.log('masuk sini')
         if (err !== null) {
+          console.log(err)
           reject(err)
         } else {
           const db = client.db(database.database_name)
           const collection = db.collection(collectionName)
-
+          console.log(db)
+          console.log(collection)
           collection
             .insertOne(query)
             .then((doc) => {

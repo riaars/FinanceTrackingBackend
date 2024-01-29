@@ -9,16 +9,20 @@ async function addNewExpense(request) {
     category: request.category,
     detail: request.detail,
     amount: request.amount,
+    expense_id: 'EM' + getRandomInt(),
   }
+
+  console.log(data)
+  console.log(request.email)
 
   return await new Promise((resolve, reject) => {
     db.addNewEntry(expense_collection, {
-      expense_id: request.expense_id,
-      email: query.email,
+      email: request.email,
       data: data,
     })
       .then((result) => {
         if (result) {
+          console.log(result)
           resolve(data)
         }
       })
@@ -26,6 +30,12 @@ async function addNewExpense(request) {
         reject(error)
       })
   })
+}
+
+function getRandomInt() {
+  max = Number.MAX_SAFE_INTEGER
+  min = 0
+  return Math.floor(Math.random() * (max - min) + min)
 }
 
 module.exports = {
