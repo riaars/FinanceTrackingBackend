@@ -68,8 +68,26 @@ async function addNewEntry(collectionName, query) {
   console.log(collectionName)
   console.log(query)
   return await new Promise((resolve, reject) => {
-    console.log(database.url)
-    MongoClient.connect(database.url, function (err, client) {
+    console.log(database.url + database.database_name)
+    console.log(MongoClient)
+
+    const expense_db = database.url + '/' + database.database_name
+    db.mongoose
+      .connect(expense_db, function (err, client) {
+        console.log('connected')
+      })
+      .then(() => {
+        console.log('db is', expense_db)
+      })
+      .catch((error) => {
+        console.error(('Connection error', error))
+        process.exit()
+      })
+
+    /*    MongoClient.connect(database.url + database.database_name, function (
+      err,
+      client,
+    ) {
       console.log('masuk sini')
       if (err !== null) {
         console.log(err)
@@ -97,8 +115,9 @@ async function addNewEntry(collectionName, query) {
           })
       }
     }).catch((error) => {
+      console.log(error)
       console.log('failed to connect')
-    })
+    }) */
   })
 }
 
