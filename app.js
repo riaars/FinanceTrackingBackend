@@ -4,9 +4,8 @@ const database = require("./config/database.json");
 const db = require("./models");
 const config = require("./config/configuration.json");
 
-const port = 5000;
-const BACKEND_APP_HOST = config.BACKEND_APP_HOST;
-const BACKEND_APP_PORT = config.BACKEND_APP_PORT;
+const dotenv = require("dotenv");
+dotenv.config();
 
 const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
@@ -24,7 +23,8 @@ app.use("/signIn", signIn);
 app.use("/signUp", signUp);
 app.use("/inputExpense", inputExpense);
 
-const expense_db = database.url + "/" + database.database_name;
+const expense_db = `${process.env.DATABASE_URL}/${process.env.DATABASE_NAME}`;
+
 db.mongoose
   .connect(expense_db, {})
   .then(() => {
@@ -35,8 +35,8 @@ db.mongoose
     process.exit();
   });
 
-app.listen(port, () => {
+app.listen(process.env.BACKEND_APP_PORT, () => {
   console.log(
-    `Server running at: http://${BACKEND_APP_HOST}:${BACKEND_APP_PORT}`
+    `Server running at: http://${process.env.BACKEND_APP_HOST}:${process.env.BACKEND_APP_PORT}`
   );
 });
