@@ -10,7 +10,7 @@ app.use([express.json(), cors()]);
 
 const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
-const inputExpense = require("./routes/inputExpense");
+const addTransaction = require("./routes/addTransaction");
 
 app.get("/", (req, res) => {
   res.send("Finance Tracking");
@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 
 app.use("/signIn", signIn);
 app.use("/signUp", signUp);
-app.use("/inputExpense", inputExpense);
+app.use("/addTransaction", addTransaction);
 
 const expense_db = `${process.env.DATABASE_URL}/${process.env.DATABASE_NAME}`;
 

@@ -1,11 +1,16 @@
+const mongoose = require("mongoose");
+
 const MongoClient = require("mongodb").MongoClient;
 const dotenv = require("dotenv");
 dotenv.config();
 
 const db = require("../../models");
+const Transaction = db.transaction;
 
 const db_url = process.env.DATABASE_URL;
 const db_name = process.env.DATABASE_NAME;
+
+const expense_db = db_url + "/" + db_name;
 
 async function getAllEntries(collectionName) {
   return new Promise((resolve, reject) => {
@@ -69,57 +74,28 @@ async function getEntriesByQuery(collectionName, query) {
   });
 }
 
-async function addNewEntry(collectionName, query) {
-  return await new Promise((resolve, reject) => {
-    const expense_db = db_url + "/" + db_name;
-    db.mongoose
-      .connect(expense_db, function (err, client) {
-        console.log("connected");
-      })
-      .then(() => {
-        console.log("db is", expense_db);
-      })
-      .catch((error) => {
-        console.error(("Connection error", error));
-        process.exit();
-      });
-
-    /*    MongoClient.connect(database.url + database.database_name, function (
-      err,
-      client,
-    ) {
-      console.log('masuk sini')
-      if (err !== null) {
-        console.log(err)
-        client.close()
-        reject(err)
-      } else {
-        console.log('no error')
-        const db = client.db(database.database_name)
-        const collection = db.collection(collectionName)
-        console.log(db)
-        console.log(collection)
-        collection
-          .insertOne(query)
-          .then((doc) => {
-            if (client) {
-              client.close()
-            }
-            resolve(doc)
-          })
-          .catch((error) => {
-            if (client) {
-              client.close()
-            }
-            reject(error)
-          })
-      }
-    }).catch((error) => {
-      console.log(error)
-      console.log('failed to connect')
-    }) */
-  });
-}
+const connectDB = async () => {
+  try {
+    await db.mongoose.connect(expense_db, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("MongoDB Connected Successfully");
+  } catch (error) {
+    console.error("MongoDB failed to connect");
+    process.exit(1);
+  }
+};
+const addNewEntry = async (query) => {
+  try {
+    const newTransaction = new Transaction(query);
+    const savedTransaction = await newTransaction.save();
+    return savedTransaction;
+  } catch (error) {
+    console.error("Error on adding new entry");
+    throw error;
+  }
+};
 
 async function updateEntry(collectionName, filter, data) {
   return await new Promise((resolve, reject) => {

@@ -2,27 +2,18 @@ const db = require("./db_api");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const expense_collection = process.env.EXPENSE_COLLECTION;
-
 async function addNewExpense(request) {
   let data = {
     date: Date.now(),
-    budget_name: request.budget_name,
     category: request.category,
+    type: request.type,
     detail: request.detail,
     amount: request.amount,
-    expense_id: "EM" + getRandomInt(),
+    transaction_id: "trx" + getRandomInt(),
   };
 
-  console.log(data);
-  console.log(request.email);
-
   return await new Promise((resolve, reject) => {
-    db.addNewEntry(expense_collection, {
-      email: request.email,
-      data: data,
-    })
-
+    db.addNewEntry(data)
       .then((result) => {
         if (result) {
           console.log(result);
