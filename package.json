@@ -25,5 +25,8 @@
     "url": "https://github.com/riaars/expensebackend/issues"
   },
   "homepage": "https://github.com/riaars/expensebackend#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
 }
