@@ -3,8 +3,8 @@ const cors = require("cors");
 const database = require("./config/database.json");
 const db = require("./models");
 const config = require("./config/configuration.json");
-const port = 5000;
 
+const port = 5000;
 const BACKEND_APP_HOST = config.BACKEND_APP_HOST;
 const BACKEND_APP_PORT = config.BACKEND_APP_PORT;
 
@@ -17,7 +17,9 @@ const app = express();
 app.get("/", (req, res) => {
   res.send("Finance Tracking");
 });
+
 app.use([express.json(), cors()]);
+
 app.use("/signIn", signIn);
 app.use("/signUp", signUp);
 app.use("/inputExpense", inputExpense);

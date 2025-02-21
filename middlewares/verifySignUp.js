@@ -1,5 +1,4 @@
 const db = require("../models");
-const ROLES = db.ROLES;
 const User = db.user;
 
 checkDuplicateUsernameEmail = (req, res, next) => {
@@ -8,28 +7,12 @@ checkDuplicateUsernameEmail = (req, res, next) => {
   })
     .then((user) => {
       if (user) {
-        res.status(400).send({ message: "Failed! Username is already exist!" });
+        res
+          .status(400)
+          .send({ message: "Failed! Email is already registered!" });
         return;
       }
-      User.findOne({
-        email: req.body.email,
-      })
-        .then((user) => {
-          if (user) {
-            res
-              .status(400)
-              .send({ message: "Failed! Email is already exist!" });
-            return;
-          }
-
-          next();
-        })
-        .catch((err) => {
-          if (err) {
-            res.status(500).send({ message: err });
-            return;
-          }
-        });
+      next();
     })
     .catch((err) => {
       if (err) {
