@@ -9,6 +9,7 @@ router.post("/", authJWT.verifyToken, async (req, res) => {
     type: req.body.type,
     detail: req.body.detail,
     amount: req.body.amount,
+    email: req.user.email,
   };
 
   try {

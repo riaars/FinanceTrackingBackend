@@ -4,6 +4,7 @@ const Transaction = mongoose.model(
   "Transaction",
   new mongoose.Schema({
     transaction_id: String,
+    email: String,
     category: String,
     type: String,
     detail: String,

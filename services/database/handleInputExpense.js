@@ -10,13 +10,13 @@ async function addNewExpense(request) {
     detail: request.detail,
     amount: request.amount,
     transaction_id: "trx" + getRandomInt(),
+    email: request.email,
   };
 
   return await new Promise((resolve, reject) => {
     db.addNewEntry(data)
       .then((result) => {
         if (result) {
-          console.log(result);
           resolve(data);
         }
       })

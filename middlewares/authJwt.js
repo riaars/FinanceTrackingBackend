@@ -1,9 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const dotenv = require("dotenv");
+const User = require("../models/User");
 dotenv.config();
 
-verifyToken = (req, res, next) => {
+verifyToken = async (req, res, next) => {
   let token = req.header("Authorization")?.split(" ")[1];
   if (!token) {
     return res
@@ -13,6 +14,15 @@ verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
+
+    //find user info
+
+    const user = await User.findById(req.user.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    req.user = user;
+
     next();
   } catch (error) {
     res.status(401).json({ message: "Invalid token" });
