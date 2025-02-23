@@ -21,10 +21,7 @@ const signup = async (req, res) => {
     res.status(201).json({
       message: "User register successfully",
       token,
-      user: {
-        id: user._id,
-        email: user.email,
-      },
+      email: req.body.email,
     });
     return;
   } catch (error) {
@@ -53,7 +50,7 @@ const signin = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-    res.json({ message: "Login successful", token });
+    res.json({ message: "Login successful", email, token });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
