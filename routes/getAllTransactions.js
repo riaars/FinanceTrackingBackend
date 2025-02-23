@@ -5,7 +5,9 @@ const router = express.Router();
 
 router.get("/", authJWT.verifyToken, async (req, res) => {
   try {
-    const result = await handleInputExpense.getAllTransactions();
+    const result = await handleInputExpense.getAllTransactions({
+      email: req.user.email,
+    });
     if (result) {
       res.json(result);
     }

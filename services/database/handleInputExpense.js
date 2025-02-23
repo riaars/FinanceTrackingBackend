@@ -26,9 +26,9 @@ async function addNewExpense(request) {
   });
 }
 
-async function getAllTransactions() {
+async function getAllTransactions(query) {
   return await new Promise((resolve, reject) => {
-    db.getAllEntries()
+    db.getEntriesByQuery(query)
       .then((result) => {
         if (result) {
           resolve(result);

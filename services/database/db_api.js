@@ -31,38 +31,14 @@ const addNewEntry = async (query) => {
   }
 };
 
-async function getEntriesByQuery(collectionName, query) {
-  return await new Promise((resolve, reject) => {
-    MongoClient.connect(
-      db_url,
-      { useNewUrlParser: true, useUnifiedTopology: true },
-      function (err, client) {
-        if (err !== null) {
-          reject(err);
-        } else {
-          const db = client.db(db_name);
-          const collection = db.collection(collectionName);
-
-          collection
-            .find(query)
-            .toArray()
-            .then((doc) => {
-              if (client) {
-                client.close();
-              }
-              resolve(doc);
-            })
-            .catch((error) => {
-              if (client) {
-                client.close();
-              }
-              reject(error);
-            });
-        }
-      }
-    );
-  });
-}
+const getEntriesByQuery = async (query) => {
+  try {
+    const transactions = await Transaction.find(query);
+    return transactions;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 async function updateEntry(collectionName, filter, data) {
   return await new Promise((resolve, reject) => {
