@@ -40,6 +40,15 @@ const getEntriesByQuery = async (query) => {
   }
 };
 
+const updateEntryByQuery = async (filter, query) => {
+  try {
+    const transactions = await Transaction.updateOne(filter, { $set: query });
+    return transactions;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 async function updateEntry(collectionName, filter, data) {
   return await new Promise((resolve, reject) => {
     MongoClient.connect(
@@ -76,5 +85,5 @@ module.exports = {
   getAllEntries: getAllEntries,
   getEntriesByQuery: getEntriesByQuery,
   addNewEntry: addNewEntry,
-  updateEntry: updateEntry,
+  updateEntryByQuery: updateEntryByQuery,
 };

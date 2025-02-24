@@ -40,6 +40,20 @@ async function getAllTransactions(query) {
   });
 }
 
+async function updateTransaction(filter, query) {
+  return await new Promise((resolve, reject) => {
+    db.updateEntryByQuery(filter, query)
+      .then((result) => {
+        if (result) {
+          resolve(result);
+        }
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}
+
 function getRandomInt() {
   max = Number.MAX_SAFE_INTEGER;
   min = 0;
@@ -49,4 +63,5 @@ function getRandomInt() {
 module.exports = {
   addNewExpense: addNewExpense,
   getAllTransactions: getAllTransactions,
+  updateTransaction: updateTransaction,
 };
