@@ -12,6 +12,7 @@ const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
 const addTransaction = require("./routes/addTransaction");
 const updateTransaction = require("./routes/updateTransaction");
+const deleteTransaction = require("./routes/deleteTransaction");
 
 const getAllTransactions = require("./routes/getAllTransactions");
 
@@ -23,7 +24,7 @@ app.use("/signIn", signIn);
 app.use("/signUp", signUp);
 app.use("/addTransaction", addTransaction);
 app.use("/updateTransaction", updateTransaction);
-
+app.use("/deleteTransaction", deleteTransaction);
 app.use("/getAllTransactions", getAllTransactions);
 
 const expense_db = `${process.env.DATABASE_URL}/${process.env.DATABASE_NAME}`;
