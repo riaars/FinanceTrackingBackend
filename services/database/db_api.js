@@ -24,7 +24,7 @@ const addNewEntry = async (query) => {
 
 const getEntriesByQuery = async (query) => {
   try {
-    const transactions = await Transaction.find(query);
+    const transactions = await Transaction.find(query).sort({ date: -1 });
     return transactions;
   } catch (error) {
     console.log(error);
