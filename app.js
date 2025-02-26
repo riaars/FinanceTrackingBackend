@@ -27,7 +27,7 @@ app.use("/updateTransaction", updateTransaction);
 app.use("/deleteTransaction", deleteTransaction);
 app.use("/getAllTransactions", getAllTransactions);
 
-const expense_db = `${process.env.DATABASE_URL}/${process.env.DATABASE_NAME}`;
+const expense_db = `${process.env.DATABASE_URL}`;
 
 db.mongoose
   .connect(expense_db, {})
