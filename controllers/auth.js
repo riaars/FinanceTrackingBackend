@@ -9,6 +9,7 @@ dotenv.config();
 /* Signup controller  */
 const signup = async (req, res) => {
   const user = new User({
+    username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
   });
@@ -22,6 +23,7 @@ const signup = async (req, res) => {
       message: "User register successfully",
       token,
       email: req.body.email,
+      username: req.body.username,
     });
     return;
   } catch (error) {
@@ -50,7 +52,12 @@ const signin = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-    res.json({ message: "Login successful", email, token });
+    res.json({
+      message: "Login successful",
+      email,
+      token,
+      username: user.username,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
