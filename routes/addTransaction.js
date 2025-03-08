@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post("/", authJWT.verifyToken, async (req, res) => {
   const request = {
+    date: req.body.date,
     category: req.body.category,
     type: req.body.type,
     detail: req.body.detail,

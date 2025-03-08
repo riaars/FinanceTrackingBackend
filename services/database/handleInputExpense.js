@@ -4,7 +4,7 @@ dotenv.config();
 
 async function addNewExpense(request) {
   let data = {
-    date: Date.now(),
+    date: request.date,
     category: request.category,
     type: request.type,
     detail: request.detail,
