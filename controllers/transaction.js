@@ -1,7 +1,9 @@
-const handleInputExpense = require("../services/database/handleInputExpense");
+const Transaction = require("../models/Transaction");
+const { getRandomInt } = require("../utils/helpers");
 
 const addTransaction = async (req, res) => {
   const request = {
+    transaction_id: "trx" + getRandomInt(),
     date: req.body.date,
     category: req.body.category,
     type: req.body.type,
@@ -11,12 +13,9 @@ const addTransaction = async (req, res) => {
   };
 
   try {
-    const result = await handleInputExpense.addNewExpense(request);
+    const result = await new Transaction(request).save();
     if (result) {
-      res.json({
-        transaction_id: result.transaction_id,
-        ...request,
-      });
+      res.json(request);
     }
   } catch (error) {
     res.json({ message: "Error on adding new transaction" });
@@ -26,7 +25,7 @@ const addTransaction = async (req, res) => {
 
 const deleteTransaction = async (req, res) => {
   try {
-    const result = await handleInputExpense.deleteTransaction({
+    const result = await Transaction.deleteOne({
       transaction_id: req.body.transaction_id,
     });
     if (result) {
@@ -42,8 +41,8 @@ const deleteTransaction = async (req, res) => {
 
 const getAllTransactions = async (req, res) => {
   try {
-    const result = await handleInputExpense.getAllTransactions({
-      email: req.user.email,
+    const result = await Transaction.find({ email: req.user.email }).sort({
+      date: -1,
     });
     if (result) {
       res.json(result);
@@ -64,7 +63,7 @@ const updateTransaction = async (req, res) => {
   };
 
   try {
-    const result = await handleInputExpense.updateTransaction(
+    const result = await Transaction.updateOne(
       { transaction_id: req.body.transaction_id },
       request
     );
