@@ -1,20 +1,8 @@
 const express = require("express");
 const authJWT = require("../middlewares/authJwt");
-const handleInputExpense = require("../services/database/handleInputExpense");
 const router = express.Router();
+const controllers = require("../controllers/transaction");
 
-router.get("/", authJWT.verifyToken, async (req, res) => {
-  try {
-    const result = await handleInputExpense.getAllTransactions({
-      email: req.user.email,
-    });
-    if (result) {
-      res.json(result);
-    }
-  } catch (error) {
-    res.json({ message: "Error on getting all transactions" });
-    console.log(error);
-  }
-});
+router.get("/", authJWT.verifyToken, controllers.getAllTransactions);
 
 module.exports = router;
