@@ -5,7 +5,7 @@ const User = require("../models/User");
 dotenv.config();
 
 verifyToken = async (req, res, next) => {
-  let token = req.header("Authorization")?.split(" ")[1];
+  let token = req.cookies.accessToken;
   if (!token) {
     return res
       .status(403)

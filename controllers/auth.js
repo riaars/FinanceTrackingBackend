@@ -52,6 +52,13 @@ const signin = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
+
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+    });
+
     res.json({
       message: "Login successful",
       email,
@@ -63,7 +70,21 @@ const signin = async (req, res) => {
   }
 };
 
+const signout = async (req, res, next) => {
+  const accessToken = req.cookies.accessToken;
+  res.clearCookie(accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax",
+  });
+
+  res.json({ message: "Logged out successfully" });
+
+  next();
+};
+
 module.exports = {
   signup: signup,
   signin: signin,
+  signout: signout,
 };

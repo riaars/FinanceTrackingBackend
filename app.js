@@ -1,15 +1,30 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 const dotenv = require("dotenv");
 dotenv.config();
 
 const db = require("./models");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
-app.use([express.json(), cors()]);
+app.use(express.json());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
+
+const expense_db = `${process.env.DATABASE_URL}`;
 
 const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
+const signOut = require("./routes/signOut");
+
 const addTransaction = require("./routes/addTransaction");
 const updateTransaction = require("./routes/updateTransaction");
 const deleteTransaction = require("./routes/deleteTransaction");
@@ -22,12 +37,11 @@ app.get("/", (req, res) => {
 
 app.use("/signIn", signIn);
 app.use("/signUp", signUp);
+app.use(signOut);
 app.use("/addTransaction", addTransaction);
 app.use("/updateTransaction", updateTransaction);
 app.use("/deleteTransaction", deleteTransaction);
 app.use("/getAllTransactions", getAllTransactions);
-
-const expense_db = `${process.env.DATABASE_URL}`;
 
 db.mongoose
   .connect(expense_db, {})
