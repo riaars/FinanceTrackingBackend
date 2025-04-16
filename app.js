@@ -5,6 +5,9 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const csrf = require("csurf");
+const csrfProtection = csrf({ cookie: true });
+
 const db = require("./models");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
@@ -30,6 +33,20 @@ const updateTransaction = require("./routes/updateTransaction");
 const deleteTransaction = require("./routes/deleteTransaction");
 
 const getAllTransactions = require("./routes/getAllTransactions");
+
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: new MongoDBStore({
+//       uri: expense_db,
+//       collection: "sessions",
+//     }),
+//   })
+// );
+
+// app.use(csrfProtection);
 
 app.get("/", (req, res) => {
   res.send("Finance Tracking");
