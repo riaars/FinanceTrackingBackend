@@ -21,15 +21,9 @@ const signup = async (req, res) => {
       expiresIn: "1h",
     });
 
-    const verifyUrl = `http://localhost:3000/verify-email?token=${token}`;
-    // res.status(201).json({
-    //   message: "User register successfully",
-    //   token,
-    //   email: req.body.email,
-    //   username: req.body.username,
-    // });
-    // return;
-    await sendVerificationEmail(user.email, verifyUrl);
+    const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+
+    await sendVerificationEmail(user.email, user.username, verifyUrl);
     res.status(200).json({
       message: "Signup successful, please check email to verify",
     });
@@ -41,13 +35,10 @@ const signup = async (req, res) => {
 
 const verifyEmail = async (req, res) => {
   const { token } = req.body;
-  console.log(token);
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
     req.user = decoded;
     const user = await User.findById(req.user.userId).select("-password");
-    console.log(user);
 
     if (!user) {
       return res.status(404).send("User not found");
