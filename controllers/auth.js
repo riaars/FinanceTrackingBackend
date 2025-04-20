@@ -41,18 +41,18 @@ const verifyEmail = async (req, res) => {
     const user = await User.findById(req.user.userId).select("-password");
 
     if (!user) {
-      return res.status(404).send("User not found");
+      return res.status(404).send({ message: "User not found" });
     }
     if (user.isVerified) {
-      return res.status(200).send("User is already verified");
+      return res.status(200).send({ message: "User is already verified" });
     }
     // update the verified status
     user.isVerified = true;
     await user.save();
-    return res.status(200).send("Email verified successfully");
+    return res.status(200).send({ message: "Email verified successfully" });
   } catch (error) {
     console.log(error);
-    res.status(500).send("Invalid or token is expired");
+    res.status(500).send({ message: "Invalid or token is expired" });
   }
 };
 
