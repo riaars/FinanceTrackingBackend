@@ -5,9 +5,6 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const csrf = require("csurf");
-const csrfProtection = csrf({ cookie: true });
-
 const db = require("./models");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
@@ -27,6 +24,7 @@ const expense_db = `${process.env.DATABASE_URL}`;
 const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
 const signOut = require("./routes/signOut");
+const verifyEmail = require("./routes/verifyEmail");
 
 const addTransaction = require("./routes/addTransaction");
 const updateTransaction = require("./routes/updateTransaction");
@@ -54,6 +52,7 @@ app.get("/", (req, res) => {
 
 app.use("/signIn", signIn);
 app.use("/signUp", signUp);
+app.use("/verifyEmail", verifyEmail);
 app.use(signOut);
 app.use("/addTransaction", addTransaction);
 app.use("/updateTransaction", updateTransaction);
