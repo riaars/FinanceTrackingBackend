@@ -5,6 +5,7 @@ const User = db.user;
 const {
   sendVerificationEmail,
   sendConfirmationEmail,
+  sendResetPasswordEmail,
 } = require("../utils/emails");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -112,9 +113,28 @@ const signout = async (req, res, next) => {
   next();
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) return res.status(404).send({ message: "User not found" });
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "15m",
+  });
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+  await sendResetPasswordEmail(user.email, resetUrl);
+
+  return res.status(200).send({
+    message: "Reset link send to email",
+  });
+};
+
 module.exports = {
   signup: signup,
   signin: signin,
   signout: signout,
   verifyEmail: verifyEmail,
+  forgotPassword: forgotPassword,
 };

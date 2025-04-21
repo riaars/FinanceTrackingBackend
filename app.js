@@ -25,7 +25,7 @@ const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
 const signOut = require("./routes/signOut");
 const verifyEmail = require("./routes/verifyEmail");
-
+const forgotPassword = require("./routes/forgotPassword");
 const addTransaction = require("./routes/addTransaction");
 const updateTransaction = require("./routes/updateTransaction");
 const deleteTransaction = require("./routes/deleteTransaction");
@@ -53,6 +53,7 @@ app.get("/", (req, res) => {
 app.use("/signIn", signIn);
 app.use("/signUp", signUp);
 app.use("/verifyEmail", verifyEmail);
+app.use("/forgotPassword", forgotPassword);
 app.use(signOut);
 app.use("/addTransaction", addTransaction);
 app.use("/updateTransaction", updateTransaction);

@@ -58,7 +58,33 @@ async function sendConfirmationEmail(email, username) {
   await transporter.sendMail(mailOptions);
 }
 
+async function sendResetPasswordEmail(email, resetUrl) {
+  const mailOptions = {
+    from: `"Trexo" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Reset Your Trexo Password",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">     
+        <p>Hey,</p>
+        <p>We have received a request to reset your password. Click the button below to set a new one.</p>
+        <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #3459d4; color: #fff; text-decoration: none; border-radius: 5px;">
+         Reset Password
+        </a>   
+        <p style="color: #666666; font-size: 14px;">
+          This link will expire in 15 minutes. If you didn't request a password reset, you can safely ignore this email.
+        </p>
+        <p style="color: #999999; font-size: 12px; margin-top: 2rem;">
+          Need help? Contact us at <a href="mailto:support@trexo.app">support@trexo.superapp</a>
+        </p>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
 module.exports = {
   sendVerificationEmail: sendVerificationEmail,
   sendConfirmationEmail: sendConfirmationEmail,
+  sendResetPasswordEmail: sendResetPasswordEmail,
 };
