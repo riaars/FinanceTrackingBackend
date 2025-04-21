@@ -15,7 +15,7 @@ async function sendVerificationEmail(email, username, verifyUrl) {
     subject: "Verify your Trexo account",
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2>Welcome to Trexo!</h2>
+        <h2 style="color: #3459d4;">Welcome to Trexo!</h2>  
         <p>Hey <span style="color: #3459d4;"><strong>${username}</strong></span>,</p>
         <p>You are one click away from taking control your finances with us. Lets make it official! Use the button below to verify your email address and complete the registration.</p>
         <a href="${verifyUrl}" style="display: inline-block; padding: 10px 20px; background-color: #3459d4; color: #fff; text-decoration: none; border-radius: 5px;">
