@@ -58,18 +58,20 @@ async function sendConfirmationEmail(email, username) {
   await transporter.sendMail(mailOptions);
 }
 
-async function sendResetPasswordEmail(email, resetUrl) {
+async function sendResetPasswordRequestEmail(email, resetUrl) {
   const mailOptions = {
     from: `"Trexo" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: "Reset Your Trexo Password",
+    subject: "Reset Your Password",
     html: `
-      <div style="font-family: Arial, sans-serif; padding: 20px;">     
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+       <h2 style="color: #3459d4;">Reset Your Trexo Password</h2>       
         <p>Hey,</p>
         <p>We have received a request to reset your password. Click the button below to set a new one.</p>
         <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #3459d4; color: #fff; text-decoration: none; border-radius: 5px;">
          Reset Password
-        </a>   
+        </a>  
+        <br/> 
         <p style="color: #666666; font-size: 14px;">
           This link will expire in 15 minutes. If you didn't request a password reset, you can safely ignore this email.
         </p>
@@ -83,8 +85,38 @@ async function sendResetPasswordEmail(email, resetUrl) {
   await transporter.sendMail(mailOptions);
 }
 
+async function sendResetPasswordSuccessfulEmail(email, username) {
+  const mailOptions = {
+    from: `"Trexo" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Password Reset Successful",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">   
+        <h2 style="color: #3459d4;">Your password has been updated</h2>  
+        <p>Hey ${username},</p>
+        <p> We just wanted to let you know that your Trexo password was successfully reset. If this was you — great! You're all set.</p>
+
+        <p style="color: #333333;">
+          If you didn’t perform this action, please contact our support team immediately.
+        </p>
+        <a href="${process.env.FRONTEND_URL}/login" style="display: inline-block; padding: 10px 20px; background-color: #3459d4; color: #fff; text-decoration: none; border-radius: 5px;">
+         Login
+        </a>  
+        <br/> 
+       
+        <p style="color: #999999; font-size: 12px; margin-top: 2rem;">
+          Need help? Contact us at <a href="mailto:support@trexo.app">support@trexo.superapp</a>
+        </p>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
 module.exports = {
   sendVerificationEmail: sendVerificationEmail,
   sendConfirmationEmail: sendConfirmationEmail,
-  sendResetPasswordEmail: sendResetPasswordEmail,
+  sendResetPasswordRequestEmail: sendResetPasswordRequestEmail,
+  sendResetPasswordSuccessfulEmail: sendResetPasswordSuccessfulEmail,
 };

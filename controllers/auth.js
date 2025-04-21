@@ -5,7 +5,8 @@ const User = db.user;
 const {
   sendVerificationEmail,
   sendConfirmationEmail,
-  sendResetPasswordEmail,
+  sendResetPasswordSuccessfulEmail,
+  sendResetPasswordRequestEmail,
 } = require("../utils/emails");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -124,11 +125,42 @@ const forgotPassword = async (req, res) => {
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-  await sendResetPasswordEmail(user.email, resetUrl);
+  await sendResetPasswordRequestEmail(user.email, resetUrl);
 
   return res.status(200).send({
     message: "Reset link send to email",
   });
+};
+
+const resetPassword = async (req, res) => {
+  const { password, token } = req.body;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    const user = await User.findById(req.user.userId);
+    const { email, username } = user;
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const comparewithOldPassword = bcrypt.compareSync(password, user.password);
+    if (comparewithOldPassword) {
+      return res.status(500).send({
+        message: "Password can not be the same as your previous one.",
+      });
+    }
+    // update the password
+    user.password = bcrypt.hashSync(password, 8);
+    await user.save();
+    await sendResetPasswordSuccessfulEmail(email, username);
+    return res
+      .status(200)
+      .send({ message: "Password has been successfully reset" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Invalid or token is expired" });
+  }
 };
 
 module.exports = {
@@ -137,4 +169,5 @@ module.exports = {
   signout: signout,
   verifyEmail: verifyEmail,
   forgotPassword: forgotPassword,
+  resetPassword: resetPassword,
 };
