@@ -2,7 +2,10 @@ var jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../models");
 const User = db.user;
-const { sendVerificationEmail } = require("../utils/sendVerificationEmail");
+const {
+  sendVerificationEmail,
+  sendConfirmationEmail,
+} = require("../utils/emails");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -39,6 +42,7 @@ const verifyEmail = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     const user = await User.findById(req.user.userId).select("-password");
+    const { email, username } = user;
 
     if (!user) {
       return res.status(404).send({ message: "User not found" });
@@ -49,6 +53,7 @@ const verifyEmail = async (req, res) => {
     // update the verified status
     user.isVerified = true;
     await user.save();
+    await sendConfirmationEmail(email, username);
     return res.status(200).send({ message: "Email verified successfully" });
   } catch (error) {
     console.log(error);
