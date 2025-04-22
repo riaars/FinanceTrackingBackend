@@ -27,10 +27,10 @@ const signOut = require("./routes/signOut");
 const verifyEmail = require("./routes/verifyEmail");
 const forgotPassword = require("./routes/forgotPassword");
 const resetPassword = require("./routes/resetPassword");
+const changePassword = require("./routes/changePassword");
 const addTransaction = require("./routes/addTransaction");
 const updateTransaction = require("./routes/updateTransaction");
 const deleteTransaction = require("./routes/deleteTransaction");
-
 const getAllTransactions = require("./routes/getAllTransactions");
 
 // app.use(
@@ -56,6 +56,7 @@ app.use("/signUp", signUp);
 app.use("/verifyEmail", verifyEmail);
 app.use("/forgotPassword", forgotPassword);
 app.use("/resetPassword", resetPassword);
+app.use("/changePassword", changePassword);
 app.use(signOut);
 app.use("/addTransaction", addTransaction);
 app.use("/updateTransaction", updateTransaction);

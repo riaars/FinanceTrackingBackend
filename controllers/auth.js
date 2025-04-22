@@ -7,6 +7,7 @@ const {
   sendConfirmationEmail,
   sendResetPasswordSuccessfulEmail,
   sendResetPasswordRequestEmail,
+  sendChangePasswordSuccessfulEmail,
 } = require("../utils/emails");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -163,6 +164,32 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const { email, username } = req.user;
+
+  try {
+    const user = await User.findById(req.user._id);
+
+    const comparewithOldPassword = bcrypt.compareSync(oldPassword, newPassword);
+    if (comparewithOldPassword) {
+      return res.status(500).send({
+        message: "Password can not be the same as your previous one.",
+      });
+    }
+    // update the password
+    user.password = bcrypt.hashSync(newPassword, 8);
+    await user.save();
+    await sendChangePasswordSuccessfulEmail(email, username);
+    return res
+      .status(200)
+      .send({ message: "Password has been successfully updated" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Invalid or token is expired" });
+  }
+};
+
 module.exports = {
   signup: signup,
   signin: signin,
@@ -170,4 +197,5 @@ module.exports = {
   verifyEmail: verifyEmail,
   forgotPassword: forgotPassword,
   resetPassword: resetPassword,
+  changePassword: changePassword,
 };

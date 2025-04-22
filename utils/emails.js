@@ -114,9 +114,37 @@ async function sendResetPasswordSuccessfulEmail(email, username) {
   await transporter.sendMail(mailOptions);
 }
 
+async function sendChangePasswordSuccessfulEmail(email, username) {
+  const mailOptions = {
+    from: `"Trexo" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Password Change Successful",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">   
+        <h2 style="color: #3459d4;">Your password has been updated</h2>  
+        <p>Hey ${username},</p>
+        <p> We just wanted to let you know that your Trexo password was successfully updated. </p>
+
+       
+        <a href="${process.env.FRONTEND_URL}" style="display: inline-block; padding: 10px 20px; background-color: #3459d4; color: #fff; text-decoration: none; border-radius: 5px;">
+         Go to Trexo
+        </a>  
+        <br/> 
+       
+        <p style="color: #999999; font-size: 12px; margin-top: 2rem;">
+          Need help? Contact us at <a href="mailto:support@trexo.app">support@trexo.superapp</a>
+        </p>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
 module.exports = {
   sendVerificationEmail: sendVerificationEmail,
   sendConfirmationEmail: sendConfirmationEmail,
   sendResetPasswordRequestEmail: sendResetPasswordRequestEmail,
   sendResetPasswordSuccessfulEmail: sendResetPasswordSuccessfulEmail,
+  sendChangePasswordSuccessfulEmail: sendChangePasswordSuccessfulEmail,
 };
