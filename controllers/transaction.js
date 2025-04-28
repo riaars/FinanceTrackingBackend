@@ -43,6 +43,7 @@ const getAllTransactions = async (req, res) => {
   try {
     const result = await Transaction.find({ email: req.user.email }).sort({
       date: -1,
+      createdAt: -1,
     });
     if (result) {
       res.json(result);
