@@ -1,12 +1,12 @@
 const express = require("express");
 const authJWT = require("../middlewares/authJwt");
+const controllers = require("../controllers/budget");
 const router = express.Router();
-const controllers = require("../controllers/transaction");
 
 router.put(
-  "/updateTransaction",
+  "/updateMonthlyBudget",
   authJWT.verifyToken,
-  controllers.updateTransaction
+  controllers.updateMonthlyBudget
 );
 
 module.exports = router;

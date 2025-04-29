@@ -3,6 +3,6 @@ const router = express.Router();
 const controller = require("../controllers/auth");
 const authJwt = require("../middlewares/authJwt");
 
-router.post("/", authJwt.verifyToken, controller.changePassword);
+router.post("/changePassword", authJwt.verifyToken, controller.changePassword);
 
 module.exports = router;

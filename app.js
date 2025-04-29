@@ -32,7 +32,8 @@ const addTransaction = require("./routes/addTransaction");
 const updateTransaction = require("./routes/updateTransaction");
 const deleteTransaction = require("./routes/deleteTransaction");
 const getAllTransactions = require("./routes/getAllTransactions");
-
+const addMonthlyBudget = require("./routes/addMonthlyBudget");
+const updateMonthlyBudget = require("./routes/updateMonthlyBudget");
 // app.use(
 //   session({
 //     secret: process.env.SESSION_SECRET,
@@ -51,17 +52,20 @@ app.get("/", (req, res) => {
   res.send("Finance Tracking");
 });
 
-app.use("/signIn", signIn);
-app.use("/signUp", signUp);
-app.use("/verifyEmail", verifyEmail);
-app.use("/forgotPassword", forgotPassword);
-app.use("/resetPassword", resetPassword);
-app.use("/changePassword", changePassword);
+app.use(signIn);
+app.use(signUp);
+app.use(verifyEmail);
+app.use(forgotPassword);
+app.use(resetPassword);
+app.use(changePassword);
 app.use(signOut);
-app.use("/addTransaction", addTransaction);
-app.use("/updateTransaction", updateTransaction);
-app.use("/deleteTransaction", deleteTransaction);
-app.use("/getAllTransactions", getAllTransactions);
+
+app.use(addTransaction);
+app.use(updateTransaction);
+app.use(deleteTransaction);
+app.use(getAllTransactions);
+app.use(addMonthlyBudget);
+app.use(updateMonthlyBudget);
 
 db.mongoose
   .connect(expense_db, {})
