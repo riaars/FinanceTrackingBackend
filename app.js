@@ -34,6 +34,7 @@ const deleteTransaction = require("./routes/deleteTransaction");
 const getAllTransactions = require("./routes/getAllTransactions");
 const addMonthlyBudget = require("./routes/addMonthlyBudget");
 const updateMonthlyBudget = require("./routes/updateMonthlyBudget");
+const addSavingPlan = require("./routes/addSavingPlan");
 // app.use(
 //   session({
 //     secret: process.env.SESSION_SECRET,
@@ -66,6 +67,7 @@ app.use(deleteTransaction);
 app.use(getAllTransactions);
 app.use(addMonthlyBudget);
 app.use(updateMonthlyBudget);
+app.use(addSavingPlan);
 
 db.mongoose
   .connect(expense_db, {})
