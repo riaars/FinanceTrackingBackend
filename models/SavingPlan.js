@@ -7,6 +7,7 @@ const SavingPlan = mongoose.model(
       email: String,
       saving_plans: [
         {
+          saving_id: String,
           saving_name: String,
           saving_target: Number,
         },
