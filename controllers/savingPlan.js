@@ -33,8 +33,7 @@ const addSavingPlan = async (req, res) => {
 
     const updatedDoc = await SavingPlan.findOne({ email: req.user.email });
     res.json({
-      id: updatedDoc._id,
-      ...newSavingPlan,
+      updatedDoc,
     });
   } catch (error) {
     res.json({ message: "Error on adding saving plan" });
@@ -45,14 +44,22 @@ const addSavingPlan = async (req, res) => {
 const updateSavingPlan = async (req, res) => {
   const newSavingPlan = {
     saving_name: req.body.saving_name,
-    saving_amount: req.body.saving_amount,
+    saving_target: req.body.saving_target,
   };
-
   try {
     const result = await SavingPlan.updateOne(
-      { _id: req.body.id },
-      newSavingPlan
+      {
+        email: req.user.email,
+        "saving_plans.saving_id": req.body.saving_id,
+      },
+      {
+        $set: {
+          "saving_plans.$.saving_name": req.body.saving_name,
+          "saving_plans.$.saving_target": req.body.saving_target,
+        },
+      }
     );
+
     if (result) {
       res.json({
         id: result._id,
