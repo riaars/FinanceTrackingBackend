@@ -2,25 +2,40 @@ const SavingPlan = require("../models/SavingPlan");
 const { getRandomInt } = require("../utils/helpers");
 
 const addSavingPlan = async (req, res) => {
-  const request = {
-    email: req.user.email,
-    saving_plans: [
-      {
-        saving_id: "sp" + getRandomInt(),
-        saving_name: req.body.saving_name,
-        saving_target: req.body.saving_target,
-      },
-    ],
+  const newSavingPlan = {
+    saving_id: "sp" + getRandomInt(),
+    saving_name: req.body.saving_name,
+    saving_target: req.body.saving_target,
   };
 
   try {
-    const result = await new SavingPlan(request).save();
-    if (result) {
-      res.json({
-        id: result._id,
-        ...request,
+    const existingSavingPlans = await SavingPlan.findOne({
+      email: req.user.email,
+    });
+
+    if (existingSavingPlans) {
+      await SavingPlan.updateOne(
+        {
+          email: req.user.email,
+        },
+        {
+          $set: {
+            saving_plans: [newSavingPlan, ...existingSavingPlans.saving_plans],
+          },
+        }
+      );
+    } else {
+      await SavingPlan.create({
+        email: req.user.email,
+        saving_plans: [newSavingPlan],
       });
     }
+
+    const updatedDoc = await SavingPlan.findOne({ email: req.user.email });
+    res.json({
+      id: updatedDoc._id,
+      ...newSavingPlan,
+    });
   } catch (error) {
     res.json({ message: "Error on adding saving plan" });
     console.log(error);
