@@ -5,17 +5,17 @@ const addMonthlyBudget = async (req, res) => {
     email: req.user.email,
     monthly_budget: req.body.monthly_budget,
     monthly_budget_per_categories: {
-      food_dining: req.body.food_dining,
-      transportation: req.body.transportation,
-      housing: req.body.housing,
-      entertainment: req.body.entertainment,
-      bills_utilities: req.body.bills_utilities,
-      health_fitness: req.body.health_fitness,
-      shopping: req.body.shopping,
-      education: req.body.education,
-      personal_care: req.body.personal_care,
-      insurance: req.body.insurance,
-      miscellaneous: req.body.miscellaneous,
+      food_dining: req.body.monthly_budget_per_categories.food_dining,
+      transportation: req.body.monthly_budget_per_categories.transportation,
+      housing: req.body.monthly_budget_per_categories.housing,
+      entertainment: req.body.monthly_budget_per_categories.entertainment,
+      bills_utilities: req.body.monthly_budget_per_categories.bills_utilities,
+      health_fitness: req.body.monthly_budget_per_categories.health_fitness,
+      shopping: req.body.monthly_budget_per_categories.shopping,
+      education: req.body.monthly_budget_per_categories.education,
+      personal_care: req.body.monthly_budget_per_categories.personal_care,
+      insurance: req.body.monthly_budget_per_categories.insurance,
+      miscellaneous: req.body.monthly_budget_per_categories.miscellaneous,
     },
   };
 
@@ -35,25 +35,27 @@ const addMonthlyBudget = async (req, res) => {
 
 const updateMonthlyBudget = async (req, res) => {
   const request = {
-    email: req.user.email,
     monthly_budget: req.body.monthly_budget,
     monthly_budget_per_categories: {
-      food_dining: req.body.food_dining,
-      transportation: req.body.transportation,
-      housing: req.body.housing,
-      entertainment: req.body.entertainment,
-      bills_utilities: req.body.bills_utilities,
-      health_fitness: req.body.health_fitness,
-      shopping: req.body.shopping,
-      education: req.body.education,
-      personal_care: req.body.personal_care,
-      insurance: req.body.insurance,
-      miscellaneous: req.body.miscellaneous,
+      food_dining: req.body.monthly_budget_per_categories.food_dining,
+      transportation: req.body.monthly_budget_per_categories.transportation,
+      housing: req.body.monthly_budget_per_categories.housing,
+      entertainment: req.body.monthly_budget_per_categories.entertainment,
+      bills_utilities: req.body.monthly_budget_per_categories.bills_utilities,
+      health_fitness: req.body.monthly_budget_per_categories.health_fitness,
+      shopping: req.body.monthly_budget_per_categories.shopping,
+      education: req.body.monthly_budget_per_categories.education,
+      personal_care: req.body.monthly_budget_per_categories.personal_care,
+      insurance: req.body.monthly_budget_per_categories.insurance,
+      miscellaneous: req.body.monthly_budget_per_categories.miscellaneous,
     },
   };
 
   try {
-    const result = await Budget.updateOne({ _id: req.body.id }, request);
+    const result = await Budget.findOne({ email: req.user.email }).updateOne(
+      { email: req.user.email },
+      request
+    );
     if (result) {
       res.json({
         transaction_id: result.transaction_id,
