@@ -20,10 +20,17 @@ const addMonthlyBudget = async (req, res) => {
   };
 
   try {
-    const result = await new Budget(request).save();
-    if (result) {
+    const existingBudget = await Budget.findOne({ email: req.user.email });
+    if (existingBudget) {
+      await Budget.updateOne(request);
+    } else {
+      await new Budget(request).save();
+    }
+
+    const updatedBudget = await Budget.findOne({ email: req.user.email });
+
+    if (updatedBudget) {
       res.json({
-        id: result._id,
         ...request,
       });
     }
