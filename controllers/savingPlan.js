@@ -72,7 +72,20 @@ const updateSavingPlan = async (req, res) => {
   }
 };
 
+const getSavingPlans = async (req, res) => {
+  try {
+    const result = await SavingPlan.findOne({ email: req.user.email });
+    if (result) {
+      res.json(result);
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({ message: "Error on getting user saving plans" });
+  }
+};
+
 module.exports = {
   addSavingPlan: addSavingPlan,
   updateSavingPlan: updateSavingPlan,
+  getSavingPlans: getSavingPlans,
 };

@@ -36,6 +36,7 @@ const addMonthlyBudget = require("./routes/addMonthlyBudget");
 const getMonthlyBudget = require("./routes/getMonthlyBudget");
 const addSavingPlan = require("./routes/addSavingPlan");
 const updateSavingPlan = require("./routes/updateSavingPlan");
+const getSavingPlans = require("./routes/getSavingPlans");
 
 // app.use(
 //   session({
@@ -71,6 +72,7 @@ app.use(addMonthlyBudget);
 app.use(getMonthlyBudget);
 app.use(addSavingPlan);
 app.use(updateSavingPlan);
+app.use(getSavingPlans);
 
 db.mongoose
   .connect(expense_db, {})
