@@ -43,9 +43,9 @@ const addMonthlyBudget = async (req, res) => {
 const getMonthlyBudget = async (req, res) => {
   try {
     const result = await Budget.findOne({ email: req.user.email });
-    res.json({
-      result,
-    });
+    if (result) {
+      res.json(result);
+    }
   } catch (error) {
     res.json({
       message: "Error on getting the user monthly budget",
