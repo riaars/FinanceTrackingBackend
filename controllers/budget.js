@@ -40,42 +40,20 @@ const addMonthlyBudget = async (req, res) => {
   }
 };
 
-const updateMonthlyBudget = async (req, res) => {
-  const request = {
-    monthly_budget: req.body.monthly_budget,
-    monthly_budget_per_categories: {
-      food_dining: req.body.monthly_budget_per_categories.food_dining,
-      transportation: req.body.monthly_budget_per_categories.transportation,
-      housing: req.body.monthly_budget_per_categories.housing,
-      entertainment: req.body.monthly_budget_per_categories.entertainment,
-      bills_utilities: req.body.monthly_budget_per_categories.bills_utilities,
-      health_fitness: req.body.monthly_budget_per_categories.health_fitness,
-      shopping: req.body.monthly_budget_per_categories.shopping,
-      education: req.body.monthly_budget_per_categories.education,
-      personal_care: req.body.monthly_budget_per_categories.personal_care,
-      insurance: req.body.monthly_budget_per_categories.insurance,
-      miscellaneous: req.body.monthly_budget_per_categories.miscellaneous,
-    },
-  };
-
+const getMonthlyBudget = async (req, res) => {
   try {
-    const result = await Budget.findOne({ email: req.user.email }).updateOne(
-      { email: req.user.email },
-      request
-    );
-    if (result) {
-      res.json({
-        transaction_id: result.transaction_id,
-        ...request,
-      });
-    }
+    const result = await Budget.findOne({ email: req.user.email });
+    res.json({
+      result,
+    });
   } catch (error) {
-    res.json({ message: "Error on updating the budget" });
-    console.log(error);
+    res.json({
+      message: "Error on getting the user monthly budget",
+    });
   }
 };
 
 module.exports = {
   addMonthlyBudget: addMonthlyBudget,
-  updateMonthlyBudget: updateMonthlyBudget,
+  getMonthlyBudget: getMonthlyBudget,
 };

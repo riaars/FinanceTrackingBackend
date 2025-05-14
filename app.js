@@ -33,7 +33,7 @@ const updateTransaction = require("./routes/updateTransaction");
 const deleteTransaction = require("./routes/deleteTransaction");
 const getAllTransactions = require("./routes/getAllTransactions");
 const addMonthlyBudget = require("./routes/addMonthlyBudget");
-const updateMonthlyBudget = require("./routes/updateMonthlyBudget");
+const getMonthlyBudget = require("./routes/getMonthlyBudget");
 const addSavingPlan = require("./routes/addSavingPlan");
 const updateSavingPlan = require("./routes/updateSavingPlan");
 
@@ -68,7 +68,7 @@ app.use(updateTransaction);
 app.use(deleteTransaction);
 app.use(getAllTransactions);
 app.use(addMonthlyBudget);
-app.use(updateMonthlyBudget);
+app.use(getMonthlyBudget);
 app.use(addSavingPlan);
 app.use(updateSavingPlan);
 

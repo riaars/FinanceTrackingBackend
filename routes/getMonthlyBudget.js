@@ -3,10 +3,10 @@ const authJWT = require("../middlewares/authJwt");
 const controllers = require("../controllers/budget");
 const router = express.Router();
 
-router.put(
-  "/updateMonthlyBudget",
+router.get(
+  "/getMonthlyBudget",
   authJWT.verifyToken,
-  controllers.updateMonthlyBudget
+  controllers.getMonthlyBudget
 );
 
 module.exports = router;
