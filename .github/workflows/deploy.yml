@@ -1,0 +1,34 @@
+name: Deploy backend to EC2
+
+on:
+  push:
+    branches: master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{secrets.EC2_HOST}}
+          username: ${{secrets.EC2_USERNAME}}
+          key: ${{secrets.EC2_SSH_KEY}}
+
+          scripts: |
+            cd /home/ec2-user/backend-app
+
+            git pull origin master
+
+            npm install
+
+            pm2 restart all || pm2 start src/index.js --name backend-app
