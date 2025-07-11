@@ -19,8 +19,10 @@ app.use(
   })
 );
 
-const expense_db = `${process.env.DATABASE_URL}`;
-
+// const expense_db = `${process.env.DATABASE_URL}`;
+const expense_db =
+  process.env.DATABASE_URL ||
+  "mongodb+srv://riaratnasari:yjDp1n2nl8gkfEY7@cluster0.udtimuc.mongodb.net/finance_tracking?retryWrites=true&w=majority";
 const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
 const signOut = require("./routes/signOut");
