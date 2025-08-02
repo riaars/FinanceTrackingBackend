@@ -1,6 +1,9 @@
-´´´
+Start Backend:
+
+```npm start```
 
 Folder Structure
+```
 ├── Dockerfile
 ├── app.js
 ├── controllers
@@ -40,4 +43,4 @@ Folder Structure
 └── utils
 ├── emails.js
 └── helpers.js
-´´´
+```
