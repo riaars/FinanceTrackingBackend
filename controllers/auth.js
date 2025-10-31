@@ -184,11 +184,16 @@ const resetPassword = async (req, res) => {
 const changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const { email, username } = req.user;
+  const hashOldPassword = bcrypt.hashSync(oldPassword, 8);
 
   try {
     const user = await User.findById(req.user._id);
 
-    const comparewithOldPassword = bcrypt.compareSync(oldPassword, newPassword);
+    const comparewithOldPassword = bcrypt.compareSync(
+      newPassword,
+      hashOldPassword
+    );
+
     if (comparewithOldPassword) {
       return res.status(500).send({
         message: "Password can not be the same as your previous one.",
