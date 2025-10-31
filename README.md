@@ -11,7 +11,6 @@ Folder Structure
 │ ├── budget.js
 │ ├── savingPlan.js
 │ └── transaction.js
-├── folder-structure.txt
 ├── middlewares
 │ ├── authJwt.js
 │ └── verifySignUp.js
