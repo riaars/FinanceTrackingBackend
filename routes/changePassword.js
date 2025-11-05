@@ -4,6 +4,8 @@
  *   post:
  *     summary: Change password for authenticated user
  *     tags: [ChangePassword]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:

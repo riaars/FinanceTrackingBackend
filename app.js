@@ -85,9 +85,9 @@ app.use(getSavingPlans);
 const swaggerDefinition = {
   openapi: "3.0.3",
   info: {
-    title: "My API",
+    title: "API",
     version: "1.0.0",
-    description: "Example Express + Swagger setup",
+    description: "Finance Tracking API Documentation",
   },
   servers: [
     {
@@ -97,8 +97,17 @@ const swaggerDefinition = {
   ],
   components: {
     securitySchemes: {
-      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+      cookieAuth: {
+        type: "apiKey",
+        in: "cookie",
+        name: "access_token",
+      },
     },
+    security: [
+      {
+        cookieAuth: [],
+      },
+    ],
   },
 };
 
