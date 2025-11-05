@@ -89,6 +89,7 @@ const updateTransaction = async (req, res) => {
     if (result) {
       res.status(200).json({
         code: "UPDATE_TRANSACTION_SUCCESS",
+        message: "Transaction is successfully updated",
         data: {
           transaction_id: result.transaction_id,
           ...request,
