@@ -3,7 +3,7 @@
  * /resetPassword:
  *   post:
  *     summary: Reset password for unauthenticated user using reset link
- *     tags: [ResetPassword]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:

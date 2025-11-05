@@ -3,7 +3,7 @@
  * /forgotPassword:
  *   post:
  *     summary: Send reset password link to the user's email
- *     tags: [ForgotPassword]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:

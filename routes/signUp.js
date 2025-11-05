@@ -3,7 +3,7 @@
  * /signUp:
  *   post:
  *     summary: Sign up a new user with username, email, and password
- *     tags: [SignUp]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:

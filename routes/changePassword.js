@@ -1,9 +1,12 @@
 /**
  * @openapi
+ * tags:
+ *   name: Auth
+ *   description: The authentication managing API
  * /changePassword:
  *   post:
  *     summary: Change password for authenticated user
- *     tags: [ChangePassword]
+ *     tags: [Auth]
  *     security:
  *       - cookieAuth: []
  *     requestBody:

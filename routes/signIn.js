@@ -3,7 +3,7 @@
  * /signIn:
  *   post:
  *     summary: Sign in a user with email and password
- *     tags: [SignIn]
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
