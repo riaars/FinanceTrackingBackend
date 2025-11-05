@@ -146,7 +146,6 @@ const getCurrentUser = async (req, res) => {
 };
 
 const signout = async (req, res, next) => {
-  const accessToken = req.cookies.accessToken;
   const COOKIE_NAME = "accessToken";
   const common = {
     httpOnly: true,
@@ -157,7 +156,9 @@ const signout = async (req, res, next) => {
   res.clearCookie(COOKIE_NAME, common);
   res.set("Cache-Control", "no-store");
 
-  res.json({ code: "LOGOUT_SUCCESS", message: "Logged out successfully" });
+  res
+    .status(200)
+    .json({ code: "LOGOUT_SUCCESS", message: "Logged out successful" });
 
   next();
 };
@@ -167,12 +168,10 @@ const forgotPassword = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user)
-    return res
-      .status(404)
-      .send({
-        code: "USER_NOT_FOUND",
-        message: "User is not registered in the system",
-      });
+    return res.status(404).send({
+      code: "USER_NOT_FOUND",
+      message: "User is not registered in the system",
+    });
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
@@ -226,8 +225,8 @@ const resetPassword = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      code: "INVALID_OR_EXPIRED_TOKEN",
-      message: "Invalid or token is expired",
+      code: "SERVER_ERROR",
+      message: "Server error or token expired",
     });
   }
 };
