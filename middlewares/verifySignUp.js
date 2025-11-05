@@ -7,9 +7,10 @@ checkDuplicateUsernameEmail = (req, res, next) => {
   })
     .then((user) => {
       if (user) {
-        res
-          .status(400)
-          .send({ message: "Failed! Email is already registered!" });
+        res.status(400).send({
+          code: "SIGNUP_ERROR_USER_EXIST",
+          message: "Email is already registered",
+        });
         return;
       }
       next();
