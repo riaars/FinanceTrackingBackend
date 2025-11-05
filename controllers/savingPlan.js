@@ -1,9 +1,10 @@
 const SavingPlan = require("../models/SavingPlan");
 const { getRandomInt } = require("../utils/helpers");
+const { v4: uuidv4 } = require("uuid");
 
 const addSavingPlan = async (req, res) => {
   const newSavingPlan = {
-    saving_id: "sp" + getRandomInt(),
+    saving_id: uuidv4(),
     saving_name: req.body.saving_name,
     saving_target: req.body.saving_target,
   };

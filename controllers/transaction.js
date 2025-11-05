@@ -1,10 +1,9 @@
-const { transaction } = require("../models");
 const Transaction = require("../models/Transaction");
-const { getRandomInt } = require("../utils/helpers");
+const { v4: uuidv4 } = require("uuid");
 
 const addTransaction = async (req, res) => {
   const request = {
-    transaction_id: "trx" + getRandomInt(),
+    transaction_id: uuidv4(),
     date: req.body.date,
     category: req.body.category,
     type: req.body.type,
