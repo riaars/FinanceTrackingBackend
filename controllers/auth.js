@@ -31,11 +31,14 @@ const signup = async (req, res) => {
 
     await sendVerificationEmail(user.email, user.username, verifyUrl);
     res.status(200).json({
+      code: "SIGNUP_SUCCESS",
       message: "Signup successful, please check email to verify",
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Error on registering user" });
+    res
+      .status(500)
+      .json({ code: "SIGNUP_ERROR", message: "Error on registering user" });
   }
 };
 
@@ -48,19 +51,30 @@ const verifyEmail = async (req, res) => {
     const { email, username } = user;
 
     if (!user) {
-      return res.status(404).send({ message: "User not found" });
+      return res
+        .status(404)
+        .send({ code: "USER_NOT_REGISTERED", message: "User not found" });
     }
     if (user.isVerified) {
-      return res.status(200).send({ message: "User is already verified" });
+      return res.status(200).send({
+        code: "USER_IS_ALREADY_VERIFIED",
+        message: "User is already verified",
+      });
     }
     // update the verified status
     user.isVerified = true;
     await user.save();
     await sendConfirmationEmail(email, username);
-    return res.status(200).send({ message: "Email verified successfully" });
+    return res.status(200).send({
+      code: "VERIFY_USER_SUCCESS",
+      message: "Email verified successfully",
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).send({ message: "Invalid or token is expired" });
+    res.status(500).send({
+      code: "VERIFY_USER_ERROR",
+      message: "Invalid or token is expired",
+    });
   }
 };
 
@@ -70,12 +84,16 @@ const signin = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User does not exist" });
+    if (!user)
+      return res
+        .status(400)
+        .json({ code: "USER_NOT_FOUND", message: "User does not exist" });
 
     const passwordIsValid = bcrypt.compareSync(password, user.password);
 
     if (!passwordIsValid) {
       return res.status(401).json({
+        code: "INVALID_PASSWORD",
         message: "Invalid password",
         token: null,
       });
@@ -92,13 +110,18 @@ const signin = async (req, res) => {
     });
 
     res.json({
+      code: "LOGIN_SUCCESS",
       message: "Login successful",
       email,
       token,
       username: user.username,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({
+      code: "LOGIN_ERROR",
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
@@ -106,12 +129,19 @@ const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password"); // exclude password
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ code: "USER_NOT_FOUND", message: "User not found" });
     }
-    res.json(user);
+    res.json({
+      code: "GET_CURRENT_USER_SUCCESS",
+      data: user,
+    });
   } catch (err) {
     console.error("Error in /me:", err);
-    res.status(500).json({ message: "Server error" });
+    res
+      .status(500)
+      .json({ code: "GET_CUURENT_USER_ERROR", message: "Server error" });
   }
 };
 
@@ -127,7 +157,7 @@ const signout = async (req, res, next) => {
   res.clearCookie(COOKIE_NAME, common);
   res.set("Cache-Control", "no-store");
 
-  res.json({ message: "Logged out successfully" });
+  res.json({ code: "LOGOUT_SUCCESS", message: "Logged out successfully" });
 
   next();
 };
@@ -136,7 +166,10 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
 
-  if (!user) return res.status(404).send({ message: "User not found" });
+  if (!user)
+    return res
+      .status(404)
+      .send({ code: "USER_NOT_FOUND", message: "User not found" });
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
@@ -146,6 +179,7 @@ const forgotPassword = async (req, res) => {
   await sendResetPasswordRequestEmail(user.email, resetUrl);
 
   return res.status(200).send({
+    code: "RESET_LINK_SENT",
     message: "Reset link send to email",
   });
 };
@@ -159,12 +193,15 @@ const resetPassword = async (req, res) => {
     const { email, username } = user;
 
     if (!user) {
-      return res.status(404).send({ message: "User not found" });
+      return res
+        .status(404)
+        .send({ code: "USER_NOT_FOUND", message: "User not found" });
     }
 
     const comparewithOldPassword = bcrypt.compareSync(password, user.password);
     if (comparewithOldPassword) {
       return res.status(500).send({
+        code: "SAME_AS_OLD_PASSWORD",
         message: "Password can not be the same as your previous one.",
       });
     }
@@ -172,12 +209,16 @@ const resetPassword = async (req, res) => {
     user.password = bcrypt.hashSync(password, 8);
     await user.save();
     await sendResetPasswordSuccessfulEmail(email, username);
-    return res
-      .status(200)
-      .send({ message: "Password has been successfully reset" });
+    return res.status(200).send({
+      code: "PASSWORD_RESET_SUCCESS",
+      message: "Password has been successfully reset",
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).send({ message: "Invalid or token is expired" });
+    res.status(500).send({
+      code: "INVALID_OR_EXPIRED_TOKEN",
+      message: "Invalid or token is expired",
+    });
   }
 };
 
@@ -196,6 +237,7 @@ const changePassword = async (req, res) => {
 
     if (comparewithOldPassword) {
       return res.status(500).send({
+        code: "SAME_AS_OLD_PASSWORD",
         message: "Password can not be the same as your previous one.",
       });
     }
@@ -203,12 +245,16 @@ const changePassword = async (req, res) => {
     user.password = bcrypt.hashSync(newPassword, 8);
     await user.save();
     await sendChangePasswordSuccessfulEmail(email, username);
-    return res
-      .status(200)
-      .send({ message: "Password has been successfully updated" });
+    return res.status(200).send({
+      code: "PASSWORD_CHANGE_SUCCESS",
+      message: "Password has been successfully updated",
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).send({ message: "Invalid or token is expired" });
+    res.status(500).send({
+      code: "INVALID_OR_EXPIRED_TOKEN",
+      message: "Invalid or token is expired",
+    });
   }
 };
 
