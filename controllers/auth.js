@@ -169,19 +169,29 @@ const forgotPassword = async (req, res) => {
   if (!user)
     return res
       .status(404)
-      .send({ code: "USER_NOT_FOUND", message: "User not found" });
+      .send({
+        code: "USER_NOT_FOUND",
+        message: "User is not registered in the system",
+      });
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-  await sendResetPasswordRequestEmail(user.email, resetUrl);
+  try {
+    await sendResetPasswordRequestEmail(user.email, resetUrl);
 
-  return res.status(200).send({
-    code: "RESET_LINK_SENT",
-    message: "Reset link send to email",
-  });
+    return res.status(200).send({
+      code: "RESET_LINK_SENT",
+      message: "The reset link is sent to the email",
+    });
+  } catch (error) {
+    return res.status(500).send({
+      code: "SERVER_ERROR",
+      message: "Failed to send reset password link to the email",
+    });
+  }
 };
 
 const resetPassword = async (req, res) => {

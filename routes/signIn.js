@@ -44,14 +44,14 @@
  *     Login:
  *       type: object
  *       properties:
- *         email: { type: string, example: "admin" }
+ *         email: { type: string, example: "user@trexo.com" }
  *         password: { type: string, example: "123456" }
  *     LoginResponse:
  *       type: object
  *       properties:
  *         code: { type: string, example: "LOGIN_SUCCESS" }
  *         message: { type: string, example: "Login successful" }
- *         email: { type: string, example: "admin" }
+ *         email: { type: string, example: "user@trexo.com" }
  *         token: { type: string, example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
  *         username: { type: string, example: "admin" }
  *     LoginErrorResponse:

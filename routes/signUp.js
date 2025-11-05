@@ -38,8 +38,8 @@
  *     SignUp:
  *       type: object
  *       properties:
- *         username: { type: string, example: "admin" }
- *         email: { type: string, example: "admin@trexo.com" }
+ *         username: { type: string, example: "trexo_user" }
+ *         email: { type: string, example: "user@trexo.com" }
  *         password: { type: string, example: "123456" }
  *         repassword: { type: string, example: "123456" }
  *     SignUpSuccessResponse:
