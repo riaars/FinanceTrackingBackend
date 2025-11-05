@@ -94,7 +94,7 @@ const signin = async (req, res) => {
     if (!passwordIsValid) {
       return res.status(401).json({
         code: "INVALID_PASSWORD",
-        message: "Invalid password",
+        message: "Password is incorrect",
         token: null,
       });
     }
@@ -109,7 +109,7 @@ const signin = async (req, res) => {
       sameSite: "Lax",
     });
 
-    res.json({
+    res.status(200).json({
       code: "LOGIN_SUCCESS",
       message: "Login successful",
       email,

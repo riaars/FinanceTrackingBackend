@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const swaggerUi = require("swagger-ui-express");
+const swaggerJSDoc = require("swagger-jsdoc");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -10,6 +12,7 @@ const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 
 const app = express();
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -78,6 +81,41 @@ app.use(addSavingPlan);
 app.use(updateSavingPlan);
 app.use(getSavingPlans);
 
+// --- Swagger setup ---
+const swaggerDefinition = {
+  openapi: "3.0.3",
+  info: {
+    title: "My API",
+    version: "1.0.0",
+    description: "Example Express + Swagger setup",
+  },
+  servers: [
+    {
+      url: `http://${process.env.BACKEND_APP_HOST}:${process.env.BACKEND_APP_PORT}`,
+      description: "Local",
+    },
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+    },
+  },
+};
+
+const options = {
+  swaggerDefinition,
+  // Point to the files with your routes that include JSDoc comments
+  apis: ["./routes/*.js", "./app.js"],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+// Serve the UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Example health route
+app.get("/health", (req, res) => res.json({ ok: true }));
+
 db.mongoose
   .connect(expense_db, {})
   .then(() => {
@@ -92,4 +130,5 @@ app.listen(process.env.BACKEND_APP_PORT, () => {
   console.log(
     `Server running at: http://${process.env.BACKEND_APP_HOST}:${process.env.BACKEND_APP_PORT}`
   );
+  console.log(`Swagger UI on http://${process.env.BACKEND_APP_HOST}/api-docs`);
 });
