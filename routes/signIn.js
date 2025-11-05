@@ -44,8 +44,8 @@
  *     Login:
  *       type: object
  *       properties:
- *         email: { type: string, example: "user@trexo.com" }
- *         password: { type: string, example: "123456" }
+ *         email: { type: string, example: "riaratnasari@outlook.com" }
+ *         password: { type: string, example: "marisa" }
  *     LoginResponse:
  *       type: object
  *       properties:

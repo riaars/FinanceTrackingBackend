@@ -15,10 +15,14 @@ const addTransaction = async (req, res) => {
   try {
     const result = await new Transaction(request).save();
     if (result) {
-      res.json({ code: "ADD_TRANSACTION_SUCCESS", data: request });
+      res.status(200).json({
+        code: "ADD_TRANSACTION_SUCCESS",
+        message: "New transaction is added",
+        data: request,
+      });
     }
   } catch (error) {
-    res.json({
+    res.status(500).json({
       code: "ADD_TRANSACTION_ERROR",
       message: "Error on adding new transaction",
     });
@@ -32,13 +36,13 @@ const deleteTransaction = async (req, res) => {
       transaction_id: req.body.transaction_id,
     });
     if (result) {
-      res.json({
+      res.status(200).json({
         code: "DELETE_TRANSACTION_SUCCESS",
         message: `Transaction with id ${req.body.transaction_id} is successfully deleted`,
       });
     }
   } catch (error) {
-    res.json({
+    res.status(500).json({
       code: "DELETE_TRANSACTION_ERROR",
       message: "Error on deleting the transaction",
     });
@@ -53,14 +57,18 @@ const getAllTransactions = async (req, res) => {
       createdAt: -1,
     });
     if (result) {
-      res.json({ code: "GET_TRANSACTIONS_SUCCESS", data: result });
+      res.status(200).json({
+        code: "GET_TRANSACTIONS_SUCCESS",
+        message: "Successfully fetched the transactions",
+        data: result,
+      });
     }
   } catch (error) {
-    res.json({
+    console.log(error);
+    res.status(500).json({
       code: "GET_TRANSACTIONS_ERROR",
       message: "Error on getting all transactions",
     });
-    console.log(error);
   }
 };
 
@@ -79,7 +87,7 @@ const updateTransaction = async (req, res) => {
       request
     );
     if (result) {
-      res.json({
+      res.status(200).json({
         code: "UPDATE_TRANSACTION_SUCCESS",
         data: {
           transaction_id: result.transaction_id,
@@ -88,7 +96,7 @@ const updateTransaction = async (req, res) => {
       });
     }
   } catch (error) {
-    res.json({
+    res.status(500).json({
       code: "UPDATE_TRANSACTION_ERROR",
       message: "Error on updating the transaction",
     });
