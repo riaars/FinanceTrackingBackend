@@ -236,7 +236,7 @@ const changePassword = async (req, res) => {
     );
 
     if (comparewithOldPassword) {
-      return res.status(500).send({
+      return res.status(400).send({
         code: "SAME_AS_OLD_PASSWORD",
         message: "Password can not be the same as your previous one.",
       });
