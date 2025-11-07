@@ -72,12 +72,11 @@ jobs:
           echo "Expecting backend.tgz from previous step context; re-create if missing."
           if [ ! -f backend.tgz ]; then tar -czf backend.tgz -C backend .; fi
 
-      - name: (Optional) Add known_hosts
-        if: secrets.SSH_KNOWN_HOSTS != ''
+      - name: Add known_hosts (optional)
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          chmod 644 ~/.ssh/known_hosts || true
 
       - name: Upload backend.tgz to EC2
         uses: appleboy/scp-action@v0.1.7
