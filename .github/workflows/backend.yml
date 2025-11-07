@@ -1,15 +1,15 @@
-name: Backend CI & Deploy (EC2)
+name: Backend CI & Deploy (EC2, repo root)
 
 on:
   push:
     branches: ["main", "master"]
     paths:
-      - "FinanceTrackingBackend/**"
+      - "**"
       - ".github/workflows/backend.yml"
   pull_request:
     branches: ["main", "master"]
     paths:
-      - "FinanceTrackingBackend/**"
+      - "**"
       - ".github/workflows/backend.yml"
 
 permissions:
@@ -22,36 +22,34 @@ concurrency:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: FinanceTrackingBackend
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug paths
+      # Helpful diagnostics so you can see the layout in logs
+      - name: Show repo structure
         run: |
           pwd
           ls -la
-          test -f package.json && echo "package.json found"
-          test -f package-lock.json && echo "package-lock.json found" || echo "NO package-lock.json"
+          test -f package.json && echo "FOUND package.json at repo root"
+          test -f package-lock.json && echo "FOUND package-lock.json at repo root" || echo "NO package-lock.json"
 
-      # Use cache only if the lockfile exists
+      # Use cache only if the lockfile exists at repo root
       - name: Setup Node (with cache)
-        if: ${{ hashFiles('FinanceTrackingBackend/package-lock.json') != '' }}
+        if: ${{ hashFiles('package-lock.json') != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "npm"
-          cache-dependency-path: FinanceTrackingBackend/package-lock.json
+          cache-dependency-path: package-lock.json
 
-      # Fallback if no lockfile committed (prevents the cache error)
+      # Fallback if no lockfile committed (avoids cache error)
       - name: Setup Node (no cache)
-        if: ${{ hashFiles('FinanceTrackingBackend/package-lock.json') == '' }}
+        if: ${{ hashFiles('package-lock.json') == '' }}
         uses: actions/setup-node@v4
         with:
           node-version: "24"
 
-      - name: Install deps (npm ci)
+      - name: Install deps
         run: npm ci
 
       - name: Build (if present)
@@ -62,7 +60,15 @@ jobs:
 
       - name: Pack backend for deploy (push only)
         if: github.event_name == 'push'
-        run: tar -czf ../backend.tgz -C . .
+        run: tar -czf backend.tgz -C . .
+
+      - name: Upload artifact (PR only, optional)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-pr-build
+          path: .
+          retention-days: 7
 
   deploy:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
@@ -71,13 +77,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Recreate the tgz if job boundaries dropped it
       - name: Ensure archive exists (fallback)
         run: |
           if [ ! -f backend.tgz ]; then
-            echo "Recreating backend.tgz from FinanceTrackingBackend..."
-            tar -czf backend.tgz -C FinanceTrackingBackend .
+            echo "Recreating backend.tgz from repo root..."
+            tar -czf backend.tgz -C . .
           fi
 
+      # Optional known_hosts handling without using `if: secrets.*`
       - name: Add known_hosts (optional)
         env:
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
@@ -109,14 +117,18 @@ jobs:
           script: |
             set -euo pipefail
 
+            # Ensure target dir
             sudo mkdir -p /var/www/app/backend
             sudo chown -R ${USER}:${USER} /var/www/app
 
+            # Unpack new release
             tar -xzf ~/backend.tgz -C /var/www/app/backend
 
+            # Install production deps
             cd /var/www/app/backend
             npm ci --omit=dev
 
+            # Create PM2 ecosystem if your repo doesn't include one
             if [ ! -f ecosystem.config.js ]; then
               cat << 'EOF' > ecosystem.config.js
               module.exports = {
@@ -133,11 +145,12 @@ jobs:
               EOF
             fi
 
-            # load server env if present
+            # Load server env (if you created /etc/app/app.env earlier)
             [ -f /etc/profile.d/app-env.sh ] && source /etc/profile.d/app-env.sh || true
 
+            # Start / reload backend
             pm2 startOrReload ecosystem.config.js --update-env
             pm2 save
 
-            # quick smoke check (non-fatal)
+            # Non-fatal smoke check
             curl -fsS http://127.0.0.1:3000/api/health || true
