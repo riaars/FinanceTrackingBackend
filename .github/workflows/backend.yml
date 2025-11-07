@@ -21,7 +21,6 @@ concurrency:
 
 jobs:
   build-test:
-    name: Build & Test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,17 +28,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 24
+      - name: Debug paths
+        run: |
+          pwd
+          ls -la
+          test -f package.json && echo "package.json found"
+          test -f package-lock.json && echo "package-lock.json found" || echo "NO package-lock.json"
+
+      # Use cache only if the lockfile exists
+      - name: Setup Node (with cache)
+        if: ${{ hashFiles('FinanceTrackingBackend/package-lock.json') != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "npm"
           cache-dependency-path: FinanceTrackingBackend/package-lock.json
 
-      - name: Verify lockfile exists (debug)
-        run: ls -la package-lock.json
+      # Fallback if no lockfile committed (prevents the cache error)
+      - name: Setup Node (no cache)
+        if: ${{ hashFiles('FinanceTrackingBackend/package-lock.json') == '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
 
-      - name: Install deps
+      - name: Install deps (npm ci)
         run: npm ci
 
       - name: Build (if present)
@@ -48,21 +60,11 @@ jobs:
       - name: Test (if present)
         run: npm test --if-present
 
-      - name: Pack backend for deploy
+      - name: Pack backend for deploy (push only)
         if: github.event_name == 'push'
-        run: |
-          tar -czf ../backend.tgz -C . .
-
-      - name: Upload artifact (PR only, optional)
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-pr-build
-          path: FinanceTrackingBackend
-          retention-days: 7
+        run: tar -czf ../backend.tgz -C . .
 
   deploy:
-    name: Deploy to EC2
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     needs: build-test
     runs-on: ubuntu-latest
@@ -76,7 +78,7 @@ jobs:
             tar -czf backend.tgz -C FinanceTrackingBackend .
           fi
 
-      - name: Add known_hosts (optional, safe)
+      - name: Add known_hosts (optional)
         env:
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
         run: |
@@ -107,18 +109,14 @@ jobs:
           script: |
             set -euo pipefail
 
-            # ensure target dir
             sudo mkdir -p /var/www/app/backend
             sudo chown -R ${USER}:${USER} /var/www/app
 
-            # unpack
             tar -xzf ~/backend.tgz -C /var/www/app/backend
 
-            # install prod deps
             cd /var/www/app/backend
             npm ci --omit=dev
 
-            # ensure PM2 ecosystem exists if not committed
             if [ ! -f ecosystem.config.js ]; then
               cat << 'EOF' > ecosystem.config.js
               module.exports = {
@@ -135,12 +133,9 @@ jobs:
               EOF
             fi
 
-            # load server env vars if configured (/etc/app/app.env)
-            if [ -f /etc/profile.d/app-env.sh ]; then
-              source /etc/profile.d/app-env.sh
-            fi
+            # load server env if present
+            [ -f /etc/profile.d/app-env.sh ] && source /etc/profile.d/app-env.sh || true
 
-            # start or reload
             pm2 startOrReload ecosystem.config.js --update-env
             pm2 save
 
