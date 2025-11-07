@@ -24,8 +24,8 @@ app.use(
 
 // const expense_db = `${process.env.DATABASE_URL}`;
 const expense_db =
-  process.env.DATABASE_URL ||
-  "mongodb+srv://riaratnasari:yjDp1n2nl8gkfEY7@cluster0.udtimuc.mongodb.net/finance_tracking?retryWrites=true&w=majority";
+  process.env.MONGODB_URI ||
+  "mongodb+srv://riaratnasari:Morestudying2025@cluster0.udtimuc.mongodb.net/finance_tracking?retryWrites=true&w=majority";
 const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
 const signOut = require("./routes/signOut");
@@ -91,7 +91,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `http://${process.env.BACKEND_APP_HOST}:${process.env.BACKEND_APP_PORT}`,
+      url: `http://${process.env.BACKEND_APP_HOST}:${process.env.PORT}`,
       description: "Local",
     },
   ],
@@ -135,9 +135,14 @@ db.mongoose
     process.exit();
   });
 
-app.listen(process.env.BACKEND_APP_PORT, () => {
-  console.log(
-    `Server running at: http://${process.env.BACKEND_APP_HOST}:${process.env.BACKEND_APP_PORT}`
-  );
-  console.log(`Swagger UI on http://${process.env.BACKEND_APP_HOST}/api-docs`);
+// health endpoint (for checks)
+app.get("/api/health", (_req, res) => res.send("OK"));
+
+const PORT = process.env.PORT || 3000;
+// bind to all interfaces so Nginx (same host) can reach it
+const HOST = process.env.BACKEND_APP_HOST || "0.0.0.0";
+
+app.listen(PORT, () => {
+  console.log(`Server running at: http://${HOST}:${PORT}`);
+  console.log(`Swagger UI on http://${HOST}:${PORT}/api-docs`);
 });
