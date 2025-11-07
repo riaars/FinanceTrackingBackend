@@ -4,12 +4,12 @@ on:
   push:
     branches: ["main", "master"]
     paths:
-      - "backend/**"
+      - "FinanceTrackingBackend/**"
       - ".github/workflows/backend.yml"
   pull_request:
     branches: ["main", "master"]
     paths:
-      - "backend/**"
+      - "FinanceTrackingBackend/**"
       - ".github/workflows/backend.yml"
 
 permissions:
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend
+        working-directory: FinanceTrackingBackend
     steps:
       - uses: actions/checkout@v4
 
@@ -35,6 +35,9 @@ jobs:
           node-version: "24"
           cache: "npm"
           cache-dependency-path: FinanceTrackingBackend/package-lock.json
+
+      - name: Verify lockfile exists (debug)
+        run: ls -la package-lock.json
 
       - name: Install deps
         run: npm ci
@@ -50,12 +53,12 @@ jobs:
         run: |
           tar -czf ../backend.tgz -C . .
 
-      - name: Upload artifact (PR only for debugging)
+      - name: Upload artifact (PR only, optional)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: backend-pr-build
-          path: backend
+          path: FinanceTrackingBackend
           retention-days: 7
 
   deploy:
@@ -66,17 +69,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download packaged backend
-        # We created backend.tgz in the previous job at repo root using relative path
+      - name: Ensure archive exists (fallback)
         run: |
-          echo "Expecting backend.tgz from previous step context; re-create if missing."
-          if [ ! -f backend.tgz ]; then tar -czf backend.tgz -C backend .; fi
+          if [ ! -f backend.tgz ]; then
+            echo "Recreating backend.tgz from FinanceTrackingBackend..."
+            tar -czf backend.tgz -C FinanceTrackingBackend .
+          fi
 
-      - name: Add known_hosts (optional)
+      - name: Add known_hosts (optional, safe)
+        env:
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts 2>/dev/null || true
-          chmod 644 ~/.ssh/known_hosts || true
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            mkdir -p ~/.ssh
+            echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+          else
+            echo "No SSH_KNOWN_HOSTS secret set, skipping."
+          fi
 
       - name: Upload backend.tgz to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -125,7 +135,7 @@ jobs:
               EOF
             fi
 
-            # load server env vars (created earlier at /etc/app/app.env)
+            # load server env vars if configured (/etc/app/app.env)
             if [ -f /etc/profile.d/app-env.sh ]; then
               source /etc/profile.d/app-env.sh
             fi
@@ -134,5 +144,5 @@ jobs:
             pm2 startOrReload ecosystem.config.js --update-env
             pm2 save
 
-            # quick smoke check (optional)
+            # quick smoke check (non-fatal)
             curl -fsS http://127.0.0.1:3000/api/health || true
