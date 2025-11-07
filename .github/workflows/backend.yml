@@ -57,7 +57,9 @@ jobs:
 
       - name: Pack backend for deploy (push only)
         if: github.event_name == 'push'
-        run: tar -czf backend.tgz -C . .
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git archive --format=tar.gz -o backend.tgz HEAD
 
       - name: Upload artifact (PR only, optional)
         if: github.event_name == 'pull_request'
@@ -78,8 +80,8 @@ jobs:
       - name: Ensure archive exists (fallback)
         run: |
           if [ ! -f backend.tgz ]; then
-            echo "Recreating backend.tgz from repo root..."
-            tar -czf backend.tgz -C . .
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git archive --format=tar.gz -o backend.tgz HEAD
           fi
 
       # Optional known_hosts handling without using `if: secrets.*`
