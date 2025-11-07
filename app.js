@@ -91,8 +91,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `http://${process.env.BACKEND_APP_HOST}:${process.env.PORT}`,
-      description: "Local",
+      url: `http://${process.env.BACKEND_APP_HOST}:${process.env.PORT}`, //need to be fixed for production
+      description: `${process.env.NODE_ENV} server`,
     },
   ],
   components: {

@@ -103,9 +103,12 @@ const signin = async (req, res) => {
       expiresIn: "1d",
     });
 
+    const isProd = process.env.NODE_ENV === "production";
+    const isSecure = isProd && process.env.FORCE_HTTPS === "true";
+
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecure, // stays false unless FORCE_HTTPS=true
       sameSite: "Lax",
     });
 
