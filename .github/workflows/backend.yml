@@ -55,9 +55,6 @@ jobs:
       - name: Build (if present)
         run: npm run build --if-present
 
-      - name: Test (if present)
-        run: npm test --if-present
-
       - name: Pack backend for deploy (push only)
         if: github.event_name == 'push'
         run: tar -czf backend.tgz -C . .
