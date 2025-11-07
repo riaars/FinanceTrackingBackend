@@ -1,0 +1,139 @@
+name: Backend CI & Deploy (EC2)
+
+on:
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    branches: ["main", "master"]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build (if present)
+        run: npm run build --if-present
+
+      - name: Test (if present)
+        run: npm test --if-present
+
+      - name: Pack backend for deploy
+        if: github.event_name == 'push'
+        run: |
+          tar -czf ../backend.tgz -C . .
+
+      - name: Upload artifact (PR only for debugging)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-pr-build
+          path: backend
+          retention-days: 7
+
+  deploy:
+    name: Deploy to EC2
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download packaged backend
+        # We created backend.tgz in the previous job at repo root using relative path
+        run: |
+          echo "Expecting backend.tgz from previous step context; re-create if missing."
+          if [ ! -f backend.tgz ]; then tar -czf backend.tgz -C backend .; fi
+
+      - name: (Optional) Add known_hosts
+        if: secrets.SSH_KNOWN_HOSTS != ''
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Upload backend.tgz to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "backend.tgz"
+          target: "/home/${{ secrets.EC2_USER }}/"
+
+      - name: Remote deploy (extract, install, reload PM2)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            # ensure target dir
+            sudo mkdir -p /var/www/app/backend
+            sudo chown -R ${USER}:${USER} /var/www/app
+
+            # unpack
+            tar -xzf ~/backend.tgz -C /var/www/app/backend
+
+            # install prod deps
+            cd /var/www/app/backend
+            npm ci --omit=dev
+
+            # ensure PM2 ecosystem exists if not committed
+            if [ ! -f ecosystem.config.js ]; then
+              cat << 'EOF' > ecosystem.config.js
+              module.exports = {
+                apps: [
+                  {
+                    name: "backend",
+                    script: "npm",
+                    args: "start",
+                    cwd: "/var/www/app/backend",
+                    env: { NODE_ENV: "production" }
+                  }
+                ]
+              }
+              EOF
+            fi
+
+            # load server env vars (created earlier at /etc/app/app.env)
+            if [ -f /etc/profile.d/app-env.sh ]; then
+              source /etc/profile.d/app-env.sh
+            fi
+
+            # start or reload
+            pm2 startOrReload ecosystem.config.js --update-env
+            pm2 save
+
+            # quick smoke check (optional)
+            curl -fsS http://127.0.0.1:3000/api/health || true
