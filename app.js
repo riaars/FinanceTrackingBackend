@@ -3,6 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJSDoc = require("swagger-jsdoc");
+const cron = require("node-cron");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -38,11 +39,13 @@ const addTransaction = require("./routes/addTransaction");
 const updateTransaction = require("./routes/updateTransaction");
 const deleteTransaction = require("./routes/deleteTransaction");
 const getAllTransactions = require("./routes/getAllTransactions");
+
 const addMonthlyBudget = require("./routes/addMonthlyBudget");
 const getMonthlyBudget = require("./routes/getMonthlyBudget");
 const addSavingPlan = require("./routes/addSavingPlan");
 const updateSavingPlan = require("./routes/updateSavingPlan");
 const getSavingPlans = require("./routes/getSavingPlans");
+const { processDueRecurrences } = require("./service/recurrenceWorker.js");
 
 // app.use(
 //   session({
@@ -119,24 +122,35 @@ const options = {
 
 const swaggerSpec = swaggerJSDoc(options);
 
-// Serve the UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Example health route
 app.get("/health", (req, res) => res.json({ ok: true }));
-
-db.mongoose
-  .connect(expense_db, {})
-  .then(() => {
-    console.log("Successfully connect to MongoDB");
-  })
-  .catch((error) => {
-    console.error(("Connection error", error));
-    process.exit();
-  });
-
-// health endpoint (for checks)
 app.get("/api/health", (_req, res) => res.send("OK"));
+const tz = process.env.DEFAULT_TZ || "UTC";
+
+async function main() {
+  db.mongoose
+    .connect(expense_db, {})
+    .then(async () => {
+      console.log("Successfully connect to MongoDB");
+      await processDueRecurrences();
+
+      // then every 5 minutes
+      cron.schedule(
+        "*/5 * * * *",
+        async () => {
+          console.log(`[${new Date().toISOString()}] recurring tick`);
+          await processDueRecurrences();
+        },
+        { timezone: tz }
+      );
+    })
+    .catch((error) => {
+      console.error(("Connection error", error));
+      process.exit();
+    });
+}
+
+main();
 
 const PORT = process.env.PORT || 3000;
 // bind to all interfaces so Nginx (same host) can reach it

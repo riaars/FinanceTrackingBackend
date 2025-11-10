@@ -1,16 +1,26 @@
 const Transaction = require("../models/Transaction");
 const { v4: uuidv4 } = require("uuid");
+const { addInterval } = require("../utils/helpers");
 
 const addTransaction = async (req, res) => {
   const request = {
     transaction_id: uuidv4(),
-    date: req.body.date,
+    date: req.body.date ? new Date(req.body.date) : new Date(),
     category: req.body.category,
     type: req.body.type,
     detail: req.body.detail,
     amount: req.body.amount,
     email: req.user.email,
+    isRecurring: req.body.isRecurring || false,
   };
+
+  if (request.isRecurring) {
+    request.interval = req.body.interval;
+    request.timezone = req.body.timezone || "UTC";
+    request.nextDate = req.body.nextDate
+      ? new Date(req.body.nextDate)
+      : addInterval(request.date, request.interval, request.timezone);
+  }
 
   try {
     const result = await new Transaction(request).save();
