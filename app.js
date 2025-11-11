@@ -42,6 +42,7 @@ const getAllTransactions = require("./routes/getAllTransactions");
 
 const getActiveRecurrings = require("./routes/getActiveRecurrings");
 const deleteRecurring = require("./routes/deleteRecurring");
+const updateRecurring = require("./routes/updateRecurring.js");
 
 const addMonthlyBudget = require("./routes/addMonthlyBudget");
 const getMonthlyBudget = require("./routes/getMonthlyBudget");
@@ -84,6 +85,7 @@ app.use(getAllTransactions);
 
 app.use(getActiveRecurrings);
 app.use(deleteRecurring);
+app.use(updateRecurring);
 
 app.use(addMonthlyBudget);
 app.use(getMonthlyBudget);
