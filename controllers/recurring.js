@@ -20,7 +20,7 @@ const getActiveRecurrings = async (req, res) => {
     console.log(error);
     res.status(500).json({
       code: "GET_ACTIVE_RECURRINGS_ERROR",
-      message: "Error on getting all",
+      message: "Error on getting active recurrings",
     });
   }
 };
@@ -28,7 +28,7 @@ const getActiveRecurrings = async (req, res) => {
 const deleteRecurring = async (req, res) => {
   try {
     const result = await Transaction.updateOne(
-      { transaction_id: req.body.transaction_id, email: req.user.email },
+      { transaction_id: req.body.transaction_id },
       {
         $set: {
           isRecurring: false,
