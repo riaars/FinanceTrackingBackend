@@ -136,9 +136,11 @@ async function main() {
 
       // then every 5 minutes
       cron.schedule(
-        "*/5 * * * *",
+        process.env.CRON_SCHEDULE || "0 0 * * *",
         async () => {
-          console.log(`[${new Date().toISOString()}] recurring tick`);
+          console.log(
+            `[${new Date().toISOString()}] recurring worker triggered`
+          );
           await processDueRecurrences();
         },
         { timezone: tz }
