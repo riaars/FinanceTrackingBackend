@@ -20,7 +20,7 @@
  *             schema:
  *               $ref: '#/components/schemas/DeleteTransactionSuccessResponse'
  *       500:
- *         description: Server error or failed to add transaction
+ *         description: Server error or failed to delete transaction
  *         content:
  *           application/json:
  *             schema:
@@ -39,7 +39,7 @@
  *       type: object
  *       properties:
  *         code: { type: string, example: "DELETE_TRANSACTION_SUCCESS" }
- *         message: { type: string, example: "ransaction with id trx4856527773209194 is successfully deleted`" }
+ *         message: { type: string, example: "Transaction with id trx4856527773209194 is successfully deleted`" }
  *     DeleteTransactionErrorResponse:
  *       type: object
  *       properties:
