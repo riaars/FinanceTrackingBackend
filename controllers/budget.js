@@ -27,7 +27,7 @@ const addMonthlyBudget = async (req, res) => {
 
     if (updatedBudget) {
       res.status(200).json({
-        code: "BUDGET_ADD_SUCCESS",
+        code: "ADD_BUDGET_SUCCESS",
         message: "Successfully on updating the budget",
         data: { ...request },
       });
@@ -44,7 +44,7 @@ const getMonthlyBudget = async (req, res) => {
     if (result) {
       res.status(200).json({
         code: "GET_BUDGET_SUCCESS",
-        message: "Successfully get the monthly budget data",
+        message: "Successfully on getting the monthly budget data",
         data: result,
       });
     }
