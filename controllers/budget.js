@@ -8,6 +8,7 @@ const addMonthlyBudget = async (req, res) => {
 
   try {
     const existingBudget = await Budget.findOne({ email: req.user.email });
+
     let updatedBudget;
     if (existingBudget) {
       updatedBudget = await Budget.findOneAndUpdate(
@@ -16,7 +17,10 @@ const addMonthlyBudget = async (req, res) => {
         },
         {
           $set: {
-            budget_per_categories: req.body.budget_per_categories,
+            budget_per_categories: {
+              ...existingBudget.budget_per_categories,
+              ...req.body.budget_per_categories,
+            },
           },
         },
         { runValidators: true, new: true }
