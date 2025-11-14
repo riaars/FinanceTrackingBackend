@@ -5,8 +5,7 @@ const Budget = mongoose.model(
   new mongoose.Schema(
     {
       email: String,
-      monthly_budget: Number,
-      monthly_budget_per_categories: {
+      budget_per_categories: {
         food_dining: Number,
         transportation: Number,
         housing: Number,
