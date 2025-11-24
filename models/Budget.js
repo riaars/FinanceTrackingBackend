@@ -17,6 +17,7 @@ const Budget = mongoose.model(
         personal_care: Number,
         insurance: Number,
         miscellaneous: Number,
+        travel: Number,
       },
     },
     { timestamps: true }
