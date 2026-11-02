@@ -70,7 +70,9 @@ jobs:
           retention-days: 7
 
   deploy:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    # Disabled: EC2 instance was terminated. Restore the condition below once a new server is set up.
+    # if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: false
     needs: build-test
     runs-on: ubuntu-latest
     steps:
