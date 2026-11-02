@@ -23,10 +23,11 @@ app.use(
   })
 );
 
-// const expense_db = `${process.env.DATABASE_URL}`;
-const expense_db =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://riaratnasari:Morestudying2025@cluster0.udtimuc.mongodb.net/finance_tracking?retryWrites=true&w=majority";
+const expense_db = process.env.MONGODB_URI;
+if (!expense_db) {
+  console.error("MONGODB_URI is not set. Add it to your .env file.");
+  process.exit(1);
+}
 const signIn = require("./routes/signIn");
 const signUp = require("./routes/signUp");
 const signOut = require("./routes/signOut");
